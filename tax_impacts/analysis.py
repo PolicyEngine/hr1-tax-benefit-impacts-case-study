@@ -111,11 +111,11 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         'Self-Employment Income': self_employment_income,
         'Capital Gains': capital_gains,
         'Property Taxes': property_taxes,
-        'State Income Tax': state_income_tax,
         'Tip Income': tip_income,
         'Overtime Income': overtime_income,
         'Auto Loan Interest': auto_loan_interest,
         'Baseline Federal Tax Liability': baseline_income_tax,
+        'Baseline State Income Tax': state_income_tax,
         'Baseline Net Income': baseline_net_income,
         'Household Weight': household_weight,
     }
