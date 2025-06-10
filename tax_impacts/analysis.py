@@ -34,7 +34,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     
     # Get household-level baseline values
     baseline_income_tax = baseline.calculate("income_tax", map_to="household", period=year).values
-    baseline_net_income = baseline.calculate("household_net_income", map_to="household", period=year).values
+    baseline_net_income = baseline.calculate("household_net_income_including_health_benefits", map_to="household", period=year).values
 
     # Get household-level characteristics
     household_id = baseline.calculate("household_id", map_to="household", period=year).values
@@ -102,11 +102,11 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     results = {
         'Household ID': household_id,
         'State': state,
+        'Is Married': married,
+        'Number of Dependents': num_dependents,
         'Age of Head': age_head,
         'Age of Spouse': age_spouse,
         **dependent_age_columns,  # Add here
-        'Number of Dependents': num_dependents,
-        'Is Married': married,
         'Employment Income': employment_income,
         'Self-Employment Income': self_employment_income,
         'Capital Gains': capital_gains,
@@ -142,7 +142,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         # Get reformed values
         reformed_income_tax = reformed.calculate("income_tax", map_to="household", period=year).values
         reformed_state_income_tax = reformed.calculate("state_income_tax", map_to="household", period=year).values
-        reformed_net_income = reformed.calculate("household_net_income", map_to="household", period=year).values
+        reformed_net_income = reformed.calculate("household_net_income_including_health_benefits", map_to="household", period=year).values
         
         # Calculate incremental changes (from previous state)
         tax_change = reformed_income_tax - previous_income_tax
