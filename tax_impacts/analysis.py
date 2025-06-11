@@ -41,7 +41,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     state = baseline.calculate("state_code", map_to="household", period=year).values
     num_dependents = baseline.calculate("tax_unit_dependents", map_to="household", period=year).values
     married = baseline.calculate("is_married", map_to="household", period=year).values
-    employment_income = baseline.calculate("employment_income", map_to="household", period=year).values
+    employment_income = baseline.calculate("irs_employment_income", map_to="household", period=year).values
     self_employment_income = baseline.calculate("self_employment_income", map_to="household", period=year).values
     capital_gains = baseline.calculate("capital_gains", map_to="household", period=year).values
     property_taxes = baseline.calculate("real_estate_taxes", map_to="household", period=year).values
