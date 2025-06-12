@@ -244,7 +244,15 @@ def main():
         # Get the row index (position in the CSV)
         row_index = df_filtered[df_filtered['Household ID'] == household_id].index[0]
         st.dataframe(household.to_frame().T, use_container_width=True)
-
+        
+    # Add separator and radio buttons
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("Analysis Type")
+    analysis_type = st.sidebar.radio(
+        "Select what to analyze:",
+        ["Federal Taxes", "Net Income"],
+        index=0  # Default to Federal Taxes
+    )
     
     # Display household information in cards
     col1, col2 = st.columns(2)
