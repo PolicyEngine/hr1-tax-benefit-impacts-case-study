@@ -513,26 +513,29 @@ class VisualizationRenderer:
         st.subheader("🔄 HR1 Bill Impact Summary")
         
         with st.container():
-            tax_change = household_data['Total Change in Federal Tax Liability']
-            income_change = household_data['Total Change in Net Income']
-            tax_pct_change = household_data['Percentage Change in Federal Tax Liability']
-            income_pct_change = household_data['Percentage Change in Net Income']
-            
-            # Color coding
-            tax_color = "red" if tax_change > 0 else "green"
-            income_color = "green" if income_change > 0 else "red"
+            # Show different metrics based on analysis type
+            if isinstance(self.analysis_engine, FederalTaxAnalysis):
+                # Show only Federal Tax changes
+                change_value = household_data['Total Change in Federal Tax Liability']
+                pct_change = household_data['Percentage Change in Federal Tax Liability']
+                change_label = "Federal Tax Change"
+                color = "red" if change_value > 0 else "green"  # Tax increase = red, decrease = green
+                
+            else:  # NetIncomeAnalysis
+                # Show only Net Income changes
+                change_value = household_data['Total Change in Net Income']
+                pct_change = household_data['Percentage Change in Net Income']
+                change_label = "Net Income Change"
+                color = "green" if change_value > 0 else "red"  # Income increase = green, decrease = red
             
             st.markdown(f"""
-            <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
-            <h4>Overall Impact</h4>
-            <p style="color: {tax_color}; font-size: 18px; font-weight: bold;">
-            Tax Change: ${tax_change:,.2f} ({tax_pct_change:+.1f}%)
-            </p>
-            <p style="color: {income_color}; font-size: 18px; font-weight: bold;">
-            Net Income Change: ${income_change:,.2f} ({income_pct_change:+.1f}%)
-            </p>
-            </div>
-            """, unsafe_allow_html=True)
+                    <div style="padding: 10px; border-radius: 5px; background-color: #f0f2f6;">
+                    <h4>Overall Impact</h4>
+                    <p style="color: {color}; font-size: 18px; font-weight: bold;">
+                    {change_label}: ${change_value:,.2f} ({pct_change:+.1f}%)
+                    </p>
+                    </div>
+                    """, unsafe_allow_html=True) 
         
         # Statistical weight
         weight = household_data['Household Weight']
