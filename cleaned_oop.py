@@ -618,6 +618,32 @@ class VisualizationRenderer:
             logger.error(f"Error creating waterfall chart: {str(e)}")
             st.error("Error creating waterfall chart. Please try a different household.")
 
+    def render_analysis_info_card(self) -> None:
+        """Render information card about current analysis scope"""
+        st.markdown("---")  # Add separator line
+        
+        # Get list of reforms being analyzed
+        reform_names = [display_name for display_name, _ in Constants.REFORM_COLS]
+        
+        # Format the list nicely
+        if len(reform_names) > 1:
+            reforms_text = ", ".join(reform_names[:-1]) + f", and {reform_names[-1]}"
+        else:
+            reforms_text = reform_names[0]
+        
+        # Determine analysis focus based on engine type
+        if isinstance(self.analysis_engine, FederalTaxAnalysis):
+            analysis_focus = "Federal Taxes"
+        elif isinstance(self.analysis_engine, NetIncomeAnalysis):
+            analysis_focus = "Net Income overall"
+        else:
+            analysis_focus = "the selected tax type"
+        
+        # Create the info card
+        st.info(f"""
+        📋 **Analysis Scope:** We are currently analyzing the effects of {reforms_text} on {analysis_focus}.
+        """)
+
 
 class StoryGenerator:
     """Generates journalist-friendly story summaries"""
@@ -700,6 +726,9 @@ class HouseholdDashboard:
             impacts = analysis_engine.get_reform_impacts(household_data)
             story_summary = StoryGenerator.generate_story_summary(profile, household_data, impacts)
             self._render_story_summary(story_summary)
+
+            # Add analysis info card at the bottom
+            renderer.render_analysis_info_card()
             
         except Exception as e:
             logger.error(f"Error running dashboard: {str(e)}")
@@ -745,6 +774,7 @@ class HouseholdDashboard:
     def _render_story_summary(self, story_summary: str) -> None:
         st.subheader("📝 Story Summary")
         st.info(story_summary)
+    
 
 
 def main() -> None:
