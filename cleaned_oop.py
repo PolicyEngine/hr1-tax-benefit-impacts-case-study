@@ -1,10 +1,4 @@
-"""
-HR1 Tax Impact Dashboard - Object-Oriented Refactored Version
-
-A professional-grade Streamlit application for analyzing household-level impacts 
-of the HR1 tax bill with configurable analysis types and clean architecture.
-"""
-
+# The logging is probably unnecessary, but I'll leave it just in case.
 import logging
 import math
 from abc import ABC, abstractmethod
@@ -668,14 +662,13 @@ class StoryGenerator:
         # Get biggest impact
         if impacts:
             biggest_impact = max(impacts, key=lambda x: abs(x.income_change))
-            biggest_reform_text = (f"The biggest change comes from the {biggest_impact.name} "
-                                 f"(${biggest_impact.income_change:+,.2f}).")
+            biggest_reform_text = (f"The biggest change comes from the {biggest_impact.name}.")
         else:
             biggest_reform_text = "No single reform has a major impact."
         
         return (f"**Quick Story Angle:** This {profile.state} household "
-                f"{impact_level} {direction} the HR1 bill, with a net income change of "
-                f"${income_change:,.2f} ({income_pct_change:+.1f}%). {biggest_reform_text} "
+                f"{impact_level} {direction} the HR1 bill, with a net income change of $"
+                f"{income_change:,.2f} ({income_pct_change:+.1f}%). {biggest_reform_text} "
                 f"The household represents approximately {math.ceil(profile.household_weight):,} "
                 f"similar American families.")
 
