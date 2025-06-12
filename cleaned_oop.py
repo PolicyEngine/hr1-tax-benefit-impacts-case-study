@@ -32,6 +32,22 @@ class Constants:
     MAX_DEPENDENTS = 11
     CHART_HEIGHT = 500
 
+    REFORM_COLS = [
+        ("Tax Rate Reform", "Tax Rate Reform"),
+        ("Standard Deduction Reform", "Standard Deduction Reform"),
+        ("Exemption Reform", "Exemption Reform"),
+        ("Child Tax Credit Reform", "CTC Reform"),
+        ("QBID Reform", "QBID Reform"),
+        ("AMT Reform", "AMT Reform"),
+        ("SALT Reform", "SALT Reform"),
+        ("Tip Income Exemption", "Tip Income Exempt"),
+        ("Overtime Income Exemption", "Overtime Income Exempt"),
+        ("Auto Loan Interest Deduction", "Auto Loan Interest ALD"),
+        ("Miscellaneous Reform", "Miscellaneous Reform"),
+        ("Other Itemized Deductions Reform", "Other Itemized Deductions Reform"),
+        ("Pease Reform", "Pease Reform")
+    ]
+
 
 @dataclass
 class FilterConfig:
@@ -80,12 +96,11 @@ class FilterConfig:
 class ReformImpact:
     """Represents the impact of a single tax reform"""
     name: str
-    tax_change: float
-    income_change: float
+    total_change: float
     
     @property
     def is_significant(self) -> bool:
-        return abs(self.income_change) > Constants.INCOME_CHANGE_THRESHOLD
+        return abs(self.total_change) > Constants.INCOME_CHANGE_THRESHOLD
 
 
 @dataclass
@@ -331,32 +346,16 @@ class FederalTaxAnalysis(AnalysisEngine):
     """Analysis engine for Federal Tax impacts"""
     
     def get_reform_impacts(self, household_data: pd.Series) -> List[ReformImpact]:
-        reform_configs = [
-            ("Tax Rate Reform", "Tax Rate Reform"),
-            ("Standard Deduction Reform", "Standard Deduction Reform"),
-            ("Exemption Reform", "Exemption Reform"),
-            ("Child Tax Credit Reform", "CTC Reform"),
-            ("QBID Reform", "QBID Reform"),
-            ("AMT Reform", "AMT Reform"),
-            ("SALT Reform", "SALT Reform"),
-            ("Tip Income Exemption", "Tip Income Exempt"),
-            ("Overtime Income Exemption", "Overtime Income Exempt"),
-            ("Auto Loan Interest Deduction", "Auto Loan Interest ALD"),
-            ("Miscellaneous Reform", "Miscellaneous Reform"),
-            ("Other Itemized Deductions Reform", "Other Itemized Deductions Reform"),
-            ("Pease Reform", "Pease Reform")
-        ]
+        reform_configs = Constants.REFORM_COLS
         
         impacts = []
         for display_name, col_name in reform_configs:
             try:
                 tax_change = household_data[f'Change in Federal tax liability after {col_name}']
-                income_change = household_data[f'Change in Net income after {col_name}']
                 
                 impact = ReformImpact(
                     name=display_name,
-                    tax_change=tax_change,
-                    income_change=income_change
+                    total_change=tax_change,
                 )
                 
                 if impact.is_significant:
@@ -380,21 +379,7 @@ class NetIncomeAnalysis(AnalysisEngine):
     """Analysis engine for Net Income impacts"""
     
     def get_reform_impacts(self, household_data: pd.Series) -> List[ReformImpact]:
-        reform_configs = [
-            ("Tax Rate Reform", "Tax Rate Reform"),
-            ("Standard Deduction Reform", "Standard Deduction Reform"),
-            ("Exemption Reform", "Exemption Reform"),
-            ("Child Tax Credit Reform", "CTC Reform"),
-            ("QBID Reform", "QBID Reform"),
-            ("AMT Reform", "AMT Reform"),
-            ("SALT Reform", "SALT Reform"),
-            ("Tip Income Exemption", "Tip Income Exempt"),
-            ("Overtime Income Exemption", "Overtime Income Exempt"),
-            ("Auto Loan Interest Deduction", "Auto Loan Interest ALD"),
-            ("Miscellaneous Reform", "Miscellaneous Reform"),
-            ("Other Itemized Deductions Reform", "Other Itemized Deductions Reform"),
-            ("Pease Reform", "Pease Reform")
-        ]
+        reform_configs = Constants.REFORM_COLS
         
         impacts = []
         for display_name, col_name in reform_configs:
@@ -403,8 +388,7 @@ class NetIncomeAnalysis(AnalysisEngine):
                 
                 impact = ReformImpact(
                     name=display_name,
-                    tax_change=0,  # Not relevant for net income analysis
-                    income_change=income_change
+                    total_change=income_change
                 )
                 
                 if impact.is_significant:
@@ -566,11 +550,11 @@ class VisualizationRenderer:
                 with cols[i % 3]:
                     # For tax analysis, show tax changes; for income analysis, show income changes
                     if isinstance(self.analysis_engine, FederalTaxAnalysis):
-                        value = impact.tax_change
+                        value = impact.total_change
                         label = "Tax Change"
                         color = "green" if value < 0 else "red"  # Negative tax change is good
                     else:
-                        value = impact.income_change
+                        value = impact.total_change
                         label = "Income Change"
                         color = "green" if value > 0 else "red"  # Positive income change is good
                     
@@ -596,11 +580,7 @@ class VisualizationRenderer:
             running_total = baseline
             
             for impact in impacts:
-                if isinstance(self.analysis_engine, FederalTaxAnalysis):
-                    change_value = impact.tax_change
-                else:
-                    change_value = impact.income_change
-                
+                change_value = impact.total_change
                 running_total += change_value
                 waterfall_data.append((impact.name, change_value, running_total))
             
@@ -661,8 +641,9 @@ class StoryGenerator:
         
         # Get biggest impact
         if impacts:
-            biggest_impact = max(impacts, key=lambda x: abs(x.income_change))
-            biggest_reform_text = (f"The biggest change comes from the {biggest_impact.name}.")
+            biggest_impact = max(impacts, key=lambda x: abs(x.total_change))
+            biggest_reform_text = (f"The biggest change comes from the {biggest_impact.name} "
+                                 f"(${biggest_impact.total_change:+,.2f}).")
         else:
             biggest_reform_text = "No single reform has a major impact."
         
