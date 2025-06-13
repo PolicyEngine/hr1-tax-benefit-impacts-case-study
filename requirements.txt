@@ -1,5 +1,7 @@
 policyengine-core
 policyengine-us
 pandas
+plotly
+streamlit
 numpy
 pyyaml
