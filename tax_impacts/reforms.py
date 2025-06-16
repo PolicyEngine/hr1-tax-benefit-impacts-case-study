@@ -239,6 +239,33 @@ def tcja_reform():
             "gov.irs.deductions.itemized.interest.mortgage.cap.HEAD_OF_HOUSEHOLD": {
                 "2026-01-01.2100-12-31": 750000
             },
+            "gov.aca.ptc_phase_out_rate[0].amount": {
+                "2026-01-01.2100-12-31": 0
+            },
+            "gov.aca.ptc_phase_out_rate[1].amount": {
+                "2025-01-01.2100-12-31": 0
+            },
+            "gov.aca.ptc_phase_out_rate[2].amount": {
+                "2026-01-01.2100-12-31": 0
+            },
+            "gov.aca.ptc_phase_out_rate[3].amount": {
+                "2026-01-01.2100-12-31": 0.02
+            },
+            "gov.aca.ptc_phase_out_rate[4].amount": {
+                "2026-01-01.2100-12-31": 0.04
+            },
+            "gov.aca.ptc_phase_out_rate[5].amount": {
+                "2026-01-01.2100-12-31": 0.06
+            },
+            "gov.aca.ptc_phase_out_rate[6].amount": {
+                "2026-01-01.2100-12-31": 0.085
+            },
+            "gov.aca.ptc_income_eligibility[2].amount": {
+                "2026-01-01.2100-12-31": True
+            },
+            "gov.aca.ptc_phase_out_rate[1].threshold": {
+                "2026-01-01.2100-12-31": 0
+            },
         },
         country_id="us",
     )
@@ -580,6 +607,59 @@ def hr1_salt_reform():
         }
     }, country_id="us")
 
+def snap_takeup_reform():
+    return Reform.from_dict({
+        "gov.aca.ptc_phase_out_rate[0].amount": {
+            "2026-01-01.2100-12-31": 0.02
+        },
+        "gov.aca.ptc_phase_out_rate[1].threshold": {
+            "2026-01-01.2100-12-31": 1.33
+        },
+        "gov.aca.ptc_phase_out_rate[1].amount": {
+            "2025-01-01.2100-12-31": 0.03
+        },
+        "gov.aca.ptc_phase_out_rate[2].amount": {
+            "2026-01-01.2100-12-31": 0.04
+        },
+        "gov.aca.ptc_phase_out_rate[3].amount": {
+            "2026-01-01.2100-12-31": 0.063
+        },
+        "gov.aca.ptc_phase_out_rate[4].amount": {
+            "2026-01-01.2100-12-31": 0.0805
+        },
+        "gov.aca.ptc_phase_out_rate[5].amount": {
+            "2026-01-01.2100-12-31": 0.095
+        },
+        "gov.aca.ptc_phase_out_rate[6].amount": {
+            "2026-01-01.2100-12-31": 0.095
+        },
+        "gov.aca.ptc_income_eligibility[2].amount": {
+            "2026-01-01.2100-12-31": False
+        }
+}, country_id="us")
+
+
+def aca_enhanced_subsidies_reform():
+    return Reform.from_dict({
+        "gov.usda.snap.takeup_rate": {
+            "2026-01-01.2028-12-31": 0.78
+        },
+    }, country_id="us")
+
+def aca_takeup_reform():
+    return Reform.from_dict({
+        "gov.aca.takeup_rate": {
+            "2026-01-01.2028-12-31": 0.622
+        },
+    }, country_id="us")
+
+def medicaid_takeup_reform():
+    return Reform.from_dict({
+        "gov.hhs.medicaid.takeup_rate": {
+            "2026-01-01.2028-12-31": 0.88
+        },
+    }, country_id="us")
+
 def get_all_reforms():
     """Get dictionary of all reform components."""
     return {
@@ -598,4 +678,8 @@ def get_all_reforms():
         "Senior Deduction Reform": hr1_senior_deduction_reform(),
         "Auto Loan Interest ALD": hr1_auto_loan_reform(),
         "SALT Reform": hr1_salt_reform(),
+        "ACA Enhanced Subsidies Reform": aca_enhanced_subsidies_reform(),
+        "SNAP Takeup Reform": snap_takeup_reform(),
+        "ACA Takeup Reform": aca_takeup_reform(),
+        "Medicaid Takeup Reform": medicaid_takeup_reform(),
     }

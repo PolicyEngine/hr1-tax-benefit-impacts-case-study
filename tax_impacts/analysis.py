@@ -36,6 +36,13 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     baseline_income_tax = baseline.calculate("income_tax", map_to="household", period=year).values
     baseline_net_income = baseline.calculate("household_net_income", map_to="household", period=year).values
 
+    # Get Benefit values
+    baseline_benefits = baseline.calculate("household_benefits", map_to="household", period=year).values
+    medicaid_benefits = baseline.calculate("medicaid", map_to="household", period=year).values
+    ptc_benefits = baseline.calculate("aca_ptc", map_to="household", period=year).values
+    chip_benefits = baseline.calculate("chip", map_to="household", period=year).values
+    total_benefits = medicaid_benefits + ptc_benefits + chip_benefits + baseline_benefits
+
     # Get household-level characteristics
     household_id = baseline.calculate("household_id", map_to="household", period=year).values
     state = baseline.calculate("state_code", map_to="household", period=year).values
@@ -168,6 +175,11 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         'Gross Income': gross_income,
         'Baseline Federal Tax Liability': baseline_income_tax,
         'Baseline Net Income': baseline_net_income,
+        'Baseline Benefits': baseline_benefits,
+        'Baseline Medicaid': medicaid_benefits,
+        'Baseline ACA PTC': ptc_benefits,
+        'Baseline CHIP': chip_benefits,
+        'Baseline Total Benefits': total_benefits,
         'Household Weight': household_weight,
     }
 
@@ -176,6 +188,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     previous_income_tax = baseline_income_tax.copy()
     previous_state_income_tax = state_income_tax.copy()
     previous_net_income = baseline_net_income.copy()
+    previous_total_benefits = total_benefits.copy()
     
     # Apply each reform sequentially
     for reform_name, reform in reforms.items():
@@ -191,15 +204,22 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
         reformed_income_tax = reformed.calculate("income_tax", map_to="household", period=year).values
         reformed_state_income_tax = reformed.calculate("state_income_tax", map_to="household", period=year).values
         reformed_net_income = reformed.calculate("household_net_income", map_to="household", period=year).values
+        reformed_benefits = reformed.calculate("household_benefits", map_to="household", period=year).values
+        reformed_medicaid = reformed.calculate("medicaid", map_to="household", period=year).values
+        reformed_ptc = reformed.calculate("aca_ptc", map_to="household", period=year).values
+        reformed_chip = reformed.calculate("chip", map_to="household", period=year).values
+        reformed_total_benefits = reformed_medicaid + reformed_ptc + reformed_chip + reformed_benefits
         
         # Calculate incremental changes (from previous state)
         tax_change = reformed_income_tax - previous_income_tax
         state_tax_change = reformed_state_income_tax - previous_state_income_tax
+        benefits_change = reformed_total_benefits - previous_total_benefits
         net_income_change = reformed_net_income - previous_net_income
         
         # Store results
         results[f'Change in Federal tax liability after {reform_name}'] = tax_change
         results[f'Change in State tax liability after {reform_name}'] = state_tax_change
+        results[f'Change in Benefits after {reform_name}'] = benefits_change
         results[f'Change in Net income after {reform_name}'] = net_income_change
         
         # Update previous values for next iteration
@@ -210,6 +230,7 @@ def calculate_stacked_household_impacts(reforms, baseline_reform, year):
     # Add final total changes (from baseline to fully reformed)
     results[f'Total Change in Federal Tax Liability'] = previous_income_tax - baseline_income_tax
     results[f'Total Change in State Tax Liability'] = previous_state_income_tax - state_income_tax
+    results[f'Total Change in Benefits'] = previous_total_benefits - total_benefits
     results[f'Total Change in Net Income'] = previous_net_income - baseline_net_income
     
     # Calculate percentage changes
